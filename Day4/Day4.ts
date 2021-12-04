@@ -33,16 +33,16 @@ class Bingo {
     this.getWinningBoards();
   }
 
-  private getBoardScore(aBoard: Board, aLastNr: number): number {
-    let sum = 0;
+  private getBoardScore(aBoard: Board): number {
+    let score = 0;
 
     for(let i = 0; i < 5; i++) {
       for(let j = 0; j < 5; j++) {
-        sum += !aBoard[i][j].Marked ? aBoard[i][j].Nr : 0;
+        score += !aBoard[i][j].Marked ? aBoard[i][j].Nr : 0;
       }
     }
 
-    return sum * aLastNr;
+    return score;
   }
 
   private verifyWinningBoard(aBoard: Board): boolean {
@@ -84,11 +84,11 @@ class Bingo {
   }
 
   public getFirstWinningBoradScore(): number {
-    return this.getBoardScore(this.mWinningBoards[0], this.mWinningNumbers[0]);
+    return this.getBoardScore(this.mWinningBoards[0]) * this.mWinningNumbers[0];
   }
 
   public getLastWinningBoradScore(): number {
-    return this.getBoardScore(last(this.mWinningBoards), last(this.mWinningNumbers));
+    return this.getBoardScore(last(this.mWinningBoards)) * last(this.mWinningNumbers);
   }
 }
 
