@@ -42,8 +42,8 @@ class HydrothermalVents {
         let m = (p2.mY-p1.mY) / (p2.mX-p1.mX);
         let c = p1.mY - m*p1.mX;
 
-        for(let i = minX; i <= maxX ; i++) 
-          this.mMap[m*i + c][i] += 1;
+        for(let x = minX; x <= maxX ; x++) 
+          this.mMap[m*x + c][x] += 1;
       }
       else {
 
