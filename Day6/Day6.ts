@@ -1,4 +1,3 @@
-import { time } from 'console';
 import { InputFile } from '../Common/InputFile'
 
 class Simulation {
@@ -11,22 +10,35 @@ class Simulation {
 
   public Simulate(aDays: number): number {
 
-    let allFish = this.mLanternfish.length;
-    //todo
-    this.mLanternfish.forEach(timer => {
-      let daysLeft = aDays;
-      let childs = 0;
-      while(daysLeft > 6) {
-        let daysPassed = aDays - daysLeft;
+    const getChild = function(aTimer: number, aDaysLeft: number): number {
 
-        if(childs > 0 && daysPassed + 9 < aDays) 
-          childs *= 2;
-        
-        childs ++;
-        daysLeft -= timer + 1;
-        timer = 6;
+      let childs = aDaysLeft >= 0 ? 1 : 0;
+      while(aDaysLeft >= 0) {
+       
+        aDaysLeft -= aTimer + 1;
+        childs += getChild(8, aDaysLeft);
+        aTimer = 6;
       }
-      allFish += childs;
+      return childs;
+    }
+
+    let allFish = 0;
+    let fishPassed = 0;
+    let map = new Map();
+
+    this.mLanternfish.forEach(timer => {
+      
+      fishPassed ++;
+      let childFish = 0;
+
+      if(map.has(timer))
+        childFish += map.get(timer);
+      else {
+        childFish = getChild(timer, aDays);
+        map.set(timer, childFish);
+      }
+      allFish += childFish;
+      console.log(allFish + " - fish remaining " + (this.mLanternfish.length - fishPassed) + "\n");
     })
 
     return allFish;
@@ -36,5 +48,5 @@ class Simulation {
 var input = new InputFile("./day6/input.txt");
 var input1 = new InputFile("./day6/input1.txt");
 
-var life = new Simulation(input1.getContent());
-console.log(life.Simulate(80));
+var life = new Simulation(input.getContent());
+console.log(life.Simulate(256));
