@@ -1,5 +1,5 @@
 import { InputFile } from '../Common/InputFile'
-import { diffArray, includes } from '../Common/Util';
+import { diff, includes } from '../Common/Util';
 
 class Decoder {
   
@@ -59,7 +59,7 @@ class Decoder {
     segments[5] = eight.find(seg => !includes(seg, segments, one));
 
     let sixNine = aInput.filter(seg => seg.length == 6).filter(seg => seg.includes(segments[2]));
-    let seg1 = diffArray(sixNine[0].split(''), sixNine[1].split('')).find(seg => seg != segments[5]);
+    let seg1 = diff(sixNine[0].split(''), sixNine[1].split('')).find(seg => seg != segments[5]);
     
     segments[1] = seg1;
     segments[3] = one.find(seg => seg != seg1);

@@ -2,7 +2,7 @@
 const bZero = BigInt(0);
 const bOne = BigInt(1);
 
-export function diffArray<T>(aArray1: Array<T>, aArray2: Array<T>): Array<T> {
+export function diff<T>(aArray1: Array<T>, aArray2: Array<T>): Array<T> {
   return aArray1.filter(el => !aArray2.includes(el))
                 .concat(aArray2.filter(el => !aArray1.includes(el)));
 }
