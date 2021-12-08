@@ -32,7 +32,7 @@ class Decoder {
     return this.mSegToNumberMap.get(segOn);
   }
 
-  private decodeNumbers(aInput: Array<string>): Array<string> {
+  private decodeSegments(aInput: Array<string>): Array<string> {
 
     let segments = new Array<string>(7);
 
@@ -76,7 +76,7 @@ class Decoder {
       let numbers = signal[0].trim().split(' ');
       let output = signal[1].trim().split(' ');
 
-      let segments = this.decodeNumbers(numbers);
+      let segments = this.decodeSegments(numbers);
 
       let strNumber: string = ''; // we append as strings
       output.forEach(number => strNumber += this.getNumber(number, segments).toString());
