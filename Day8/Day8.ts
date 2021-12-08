@@ -53,16 +53,16 @@ class Decoder {
     // remove segs of 1 from 4
     four = four.filter(seg => !one.includes(seg));
 
-    segments[2] = three.filter(seg => includes(seg, four)).join('');
-    segments[6] = four.filter(seg => !includes(seg, segments, one)).join('');
-    segments[4] = three.filter(seg => !includes(seg, segments, one)).join('');
-    segments[5] = eight.filter(seg => !includes(seg, segments, one)).join('');
+    segments[2] = three.find(seg => includes(seg, four));
+    segments[6] = four.find(seg => !includes(seg, segments, one));
+    segments[4] = three.find(seg => !includes(seg, segments, one));
+    segments[5] = eight.find(seg => !includes(seg, segments, one));
 
     let sixNine = aInput.filter(seg => seg.length == 6).filter(seg => seg.includes(segments[2]));
-    let seg0 = diffArray(sixNine[0].split(''), sixNine[1].split('')).find(seg => seg != segments[5]);
+    let seg1 = diffArray(sixNine[0].split(''), sixNine[1].split('')).find(seg => seg != segments[5]);
     
-    segments[1] = seg0;
-    segments[3] = one.find(seg => seg != seg0);
+    segments[1] = seg1;
+    segments[3] = one.find(seg => seg != seg1);
 
     return segments;
   }
