@@ -1,58 +1,68 @@
 import { InputFile } from '../Common/InputFile'
+import { diffArray, includes } from '../Common/Util';
 
 class Decoder {
   
   private mInput: Array<string>;
+  private mSegToNumberMap: Map<string, number>;
 
   constructor(aInput: Array<string>) {
+
+    this.mSegToNumberMap = new Map([
+      ["013456",  0],
+      ["13",      1],
+      ["01245",   2],
+      ["01234",   3],
+      ["1236",    4],
+      ["02346",   5],
+      ["023456",  6],
+      ["013",     7],
+      ["0123456", 8],
+      ["012346",  9],
+    ]);
 
     this.mInput = aInput;
   }
 
   private getNumber(aSegCode: string, aSegments: Array<string>): number {
 
-    let map = new Map();
-    map.set("013456", 0);
-    map.set("13", 1);
-    map.set("01245", 2);
-    map.set("01234", 3);
-    map.set("1236", 4);
-    map.set("02346", 5);
-    map.set("023456", 6);
-    map.set("013", 7);
-    map.set("0123456", 8);
-    map.set("012346", 9);
+    let segOn = aSegCode.split('').map(seg => aSegments.indexOf(seg))
+                        .sort((a, b) => a - b).join('');
 
-    let segOn = aSegments.map(seg => aSegCode.includes(seg) ? seg : '');
-
-    let idx = segOn.map((seg, idx) => seg != '' ? idx : -1).filter(seg => seg != -1).join('');
-    return map.get(idx);
+    return this.mSegToNumberMap.get(segOn);
   }
 
   private decodeNumbers(aInput: Array<string>): Array<string> {
 
     let segments = new Array<string>(7);
 
-    let one = aInput.find(segments => segments.length == 2);
-    let four = aInput.find(segments => segments.length == 4);
-    let seven = aInput.find(segments => segments.length == 3);
-    let eight = aInput.find(segments => segments.length == 7);
+    // identify segments
+    let one = aInput.find(seg => seg.length == 2).split('');
+    let four = aInput.find(seg => seg.length == 4).split('');
+    let seven = aInput.find(seg => seg.length == 3).split('');
+    let eight = aInput.find(seg => seg.length == 7).split('');
 
-    seven = seven.split('').filter(ch => !one.includes(ch)).join('');
-    four = four.split('').filter(ch => !one.includes(ch)).join('');
+    // seg 0 is 7 without 1
+    segments[0] = seven.filter(seg => !includes(seg, one)).join('');
 
-    segments[1] = one[0];
-    segments[3] = one[1];
-    segments[0] = seven[0];
-
-    let fiveSeg = aInput.filter(segments => segments.length == 5);
-    fiveSeg = fiveSeg.map(seg => seg.split('').filter(ch => !segments.includes(ch)).join(''));
+    // get nrs with 5 segments
+    let fiveSeg = aInput.filter(seg => seg.length == 5).map(seg => seg.split('')
+                        .filter(seg => !includes(seg, segments, one)));
     let three = fiveSeg.find(seg => seg.length == 2);
 
-    segments[2] = three.split('').filter(ch => four.includes(ch)).join('');
-    segments[6] = four.split('').filter(ch => !segments.includes(ch)).join('');
-    segments[4] = three.split('').filter(ch => !segments.includes(ch)).join('');
-    segments[5] = eight.split('').filter(ch => !segments.includes(ch)).join('');
+    // remove segs of 1 from 4
+    four = four.filter(seg => !one.includes(seg));
+
+    segments[2] = three.filter(seg => includes(seg, four)).join('');
+    segments[6] = four.filter(seg => !includes(seg, segments, one)).join('');
+    segments[4] = three.filter(seg => !includes(seg, segments, one)).join('');
+    segments[5] = eight.filter(seg => !includes(seg, segments, one)).join('');
+
+    let sixNine = aInput.filter(seg => seg.length == 6).filter(seg => seg.includes(segments[2]));
+    let seg0 = diffArray(sixNine[0].split(''), sixNine[1].split('')).find(seg => seg != segments[5]);
+    
+    segments[1] = seg0;
+    segments[3] = one.find(seg => seg != seg0);
 
     return segments;
   }
@@ -68,12 +78,10 @@ class Decoder {
 
       let segments = this.decodeNumbers(numbers);
 
-      let nrStr: string = '';
-      output.forEach(number => {
-        let nr = this.getNumber(number, segments);
-        nrStr += nr.toString();
-      })
-      count += Number(nrStr);
+      let strNumber: string = ''; // we append as strings
+      output.forEach(number => strNumber += this.getNumber(number, segments).toString());
+
+      count += parseInt(strNumber);
     })
 
     return count;
@@ -84,5 +92,5 @@ var input = new InputFile("./day8/input.txt");
 var input1 = new InputFile("./day8/input1.txt");
 var input2 = new InputFile("./day8/input2.txt");
 
-var decoder = new Decoder(input1.getAsLines());
+var decoder = new Decoder(input.getAsLines());
 console.log(decoder.Decode());

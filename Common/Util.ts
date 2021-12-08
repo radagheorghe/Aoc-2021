@@ -2,6 +2,20 @@
 const bZero = BigInt(0);
 const bOne = BigInt(1);
 
+export function diffArray<T>(aArray1: Array<T>, aArray2: Array<T>): Array<T> {
+  return aArray1.filter(el => !aArray2.includes(el))
+                .concat(aArray2.filter(el => !aArray1.includes(el)));
+}
+
+export function includes<T>(aElem: T, ...args): boolean {
+  for(let arg of args) {
+    if(arg.includes(aElem))
+      return true;
+  }
+
+  return false;
+}
+
 export function cloneArray<T>(aToClone: Array<T>): Array<T> {
   return JSON.parse(JSON.stringify(aToClone));
 }
