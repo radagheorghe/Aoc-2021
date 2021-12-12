@@ -80,10 +80,10 @@ class CavePathing {
       return false;
     }
 
-    const getAllPaths = function(aCurr:string, aEnd: string, aLocalPath: Array<string>)
+    const getAllPaths = function(aCurr:string, aEnd: string, aCurrPath: Array<string>)
     {
       if (aCurr == aEnd) {
-        console.log(aLocalPath);
+        console.log(aCurrPath);
         allPaths++;
         return;
       }
@@ -95,10 +95,10 @@ class CavePathing {
         if (visited.get(cave) == 0 || 
             (allowMultipleVisits(cave) && !visitedMultipleSmallCaves(cave))) {
             
-          aLocalPath.push(cave);
-          getAllPaths(cave, aEnd, aLocalPath);
+          aCurrPath.push(cave);
+          getAllPaths(cave, aEnd, aCurrPath);
 
-          aLocalPath.pop();
+          aCurrPath.pop();
         }
       }
 
@@ -106,11 +106,11 @@ class CavePathing {
       visited.set(aCurr, visit - 1);
     }
     
-    let path = new Array<string>();
-    path.push('start');
+    let currPath = new Array<string>();
+    currPath.push('start');
 
     let allPaths = 0;
-    getAllPaths('start', 'end', path);
+    getAllPaths('start', 'end', currPath);
     
     return allPaths;
   }
