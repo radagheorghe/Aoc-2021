@@ -1,5 +1,4 @@
 import { InputFile } from '../Common/InputFile'
-import { writeFileSync } from 'fs'
 
 const mapSize = 5000;
 const offset = mapSize / 2;
