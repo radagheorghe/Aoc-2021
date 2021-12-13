@@ -38,7 +38,7 @@ class TransparentOrigami {
 
     this.mFolds = new Array<{type: string, nr: number}>();
 
-    aInput[1].split(' ').map(fold => {
+    aInput[1].split(' ').forEach(fold => {
       let xy = fold.split('=');
       if(xy.length == 2) 
         this.mFolds.push({type: xy[0], nr: Number(xy[1]) + offset})
