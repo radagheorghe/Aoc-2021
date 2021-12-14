@@ -1,5 +1,4 @@
 import { InputFile } from '../Common/InputFile'
-import { last } from '../Common/Util'
 
 class Polymerization {
   
@@ -18,58 +17,42 @@ class Polymerization {
 
   public apply(aSteps: number): number {
 
-    let seq1 = this.mSeq.substring(0, this.mSeq.length / 2);
-    let seq2 = this.mSeq.substring(this.mSeq.length / 2, this.mSeq.length);
+    let connnections = new Map<string, number>();
 
-    let seqs = this.mSeq.split('');
-
-    const getFromIndex = function(aIdx: number): string {
-      let prevLength = 0;
-      for(let seq of seqs) {
-        if(aIdx <= prevLength) {
-          return seq[aIdx - prevLength];
-        }
-        prevLength += seq.length;
-      }
+    const addConn = function(aConn: string, aFreq: number) {
+      let freq = connnections.get(aConn);
+      connnections.set(aConn, freq ? freq + aFreq : 1);
     }
 
-    for(let step = 0; step < aSteps; step++) {
-      
-      console.log(seqs.join());
+    for(let i = 0; i < this.mSeq.length - 1; i++)
+      addConn(this.mSeq[i] + this.mSeq[i+1], 1);
 
-      let newSeqs = new Array<string>(seqs.length);
-      
-      const appendSeq = function(aIdx: number, aPair: string) {
-        let prev = '';
-        let seqIdx = 0;
-        let prevLength = 0;
-        for(let seq of seqs) {
-          if(aIdx <= prevLength) {
-            newSeqs[seqIdx] += seq[aIdx - prev.length] + aPair;
-          }
-          prev = seq;
-          seqIdx ++;
-        }
-      }
+    for(let step = 0; step < aSteps -1; step ++) {
 
-      for(let i = 0; i < seq1.length + seq2.length - 1; i++) {
+      console.log(step);
 
-        let pair = getFromIndex(i) + getFromIndex(i+1);
-        appendSeq(i, this.mRules.get(pair));
-      }
-      seqs = Array.from(newSeqs);
+      let conns = Array.from(connnections.keys());
+      let freqs = Array.from(connnections.values());
+
+      for(let i = 0; i < conns.length; i++) {
+
+        let conn = conns[i];
+        let freq = freqs[i];
+
+        addConn(conn[0] + this.mRules.get(conn), freq);
+        addConn(this.mRules.get(conn) + conn[1], freq);
+        
+        let freq1 = connnections.get(conn);
+        if(freq1 != undefined && freq1 <= 1)
+          connnections.delete(conn);
+        else if(freq1 != undefined)
+          connnections.set(conn, freq1 - freq);
+      }      
     }
 
-    let mapCount = new Map<string, number>();
-    for(let i = 0; i < this.mSeq.length; i++) {
-      if(mapCount.has(this.mSeq[i]))
-        mapCount.set(this.mSeq[i], mapCount.get(this.mSeq[i]) + 1);
-      else
-        mapCount.set(this.mSeq[i], 1);
-    }
+    console.log(connnections);
 
-    let values = Array.from(mapCount.values());
-    return Math.max(...values) - Math.min(...values);
+    return 0;
   }
 }
 
