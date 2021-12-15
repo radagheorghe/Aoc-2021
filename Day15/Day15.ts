@@ -1,20 +1,5 @@
 import { InputFile } from '../Common/InputFile'
 
-function newMatrix<T>(aSizeX : number, aSizeY: number, aFill: T): Array<Array<T>> {
-  let array = new Array<Array<T>>(aSizeY);
-  for(let y = 0; y < aSizeY; y ++)
-    array.push(new Array<T>(aSizeX).fill(aFill));
-
-  return array;
-}
-
-function pointInMatrix<T>(aMatrix: Array<Array<T>>, aPoint: Point): T | undefined {
-  if(aPoint.mX < 0 || aPoint.mX >= aMatrix[0].length || aPoint.mY > 0 || aPoint.mY >= aMatrix.length)
-    return undefined;
-
-  return aMatrix[aPoint.mY][aPoint.mX];
-}
-
 class Point {
 
   public mX: number;
@@ -39,65 +24,84 @@ class Chiton {
 
   constructor(aInput: Array<string>) {
 
-    this.mSizeX = aInput[0].length;
     this.mMap = new Array<Array<number>>();
-    aInput.forEach(line => {
-      this.mMap.push(line.split('').map(nr => Number(nr)));
+    aInput.forEach(inputLine => {
+      let line = inputLine.split('').map(nr => Number(nr));
+      let chunkSize = line.length;
+      for(let chunk = 0; chunk < 4; chunk ++)
+        for(let x = 0; x < chunkSize; x ++) {
+          let toAdd = line[x + chunk * chunkSize];
+          line.push(toAdd == 9 ? 1 : toAdd + 1);
+        }
+      this.mMap.push(line);
     })
+    
+    this.mSizeX = this.mMap[0].length;
+    
+    let chunkSize = this.mMap.length;
+    for(let chunk = 0; chunk < 4; chunk ++)
+      for(let y = 0; y < chunkSize; y ++) {
+        let newLine = new Array<number>();
+        for(let x = 0; x < this.mSizeX; x++) {
+          let toAdd = this.mMap[y + chunk * chunkSize][x];
+          newLine.push(toAdd == 9 ? 1 : toAdd + 1);
+        }
+        this.mMap.push(newLine);
+      }
     this.mSizeY = this.mMap.length;
+  }
+
+  private testPoint(aPoint: Point): boolean {
+    if(aPoint.mX < 0 || aPoint.mX >= this.mMap[0].length || aPoint.mY < 0 || aPoint.mY >= this.mMap.length)
+      return false;
+  
+    return true;
   }
 
   public findShortestPath(): number
   {
-    let aStart = new Point(0, 0);    
-    let aEnd = new Point(this.mSizeX, this.mSizeY);
-
     let row = [ -1, 0, 0, 1 ];
     let col = [ 0, -1, 1, 0 ];
 
-    let visited = newMatrix<boolean>(this.mSizeX, this.mSizeY, false);
+    let visited = new Array<Array<boolean>>();
+    for(let y = 0; y < this.mSizeY; y ++)
+      visited.push(new Array<boolean>(this.mSizeX).fill(false));
+
     let q = new Array<{xy: Point, cost: number}>();
 
-    visited[aStart.mY][aStart.mX] = true;
-    q.push({xy: aStart, cost: 0});
-
-    let minDist = 1000;
+    visited[0][0] = true;
+    q.push({xy: new Point(0, 0), cost: 0});
 
     while (q.length != 0)
     {
-      // dequeue front node and process it
+      q.sort((a, b) => b.cost - a.cost);
       let node = q.pop();
       
       let crPos = node.xy;
       let dist = node.cost;
       
-      if (crPos.mX == aEnd.mX && crPos.mX == aEnd.mY)
-      {
-        minDist = dist;
-        break;
-      }
+      if (crPos.mX == this.mSizeX - 1 && crPos.mY == this.mSizeY - 1)
+        return dist;
 
       for (let k = 0; k < 4; k++)
       {
         let newPos = new Point(crPos.mX + row[k], crPos.mY + col[k]);
-        if (pointInMatrix(this.mMap, newPos) && pointInMatrix(visited, newPos) == false)
+        if (this.testPoint(newPos) && !visited[newPos.mY][newPos.mX])
         {
           visited[newPos.mY][newPos.mX] = true;
-          q.push({xy: newPos, cost: dist + this.mMap[newPos.mY][newPos.mX]});
+          let newCost = dist + this.mMap[newPos.mY][newPos.mX];
+
+          q.push({xy: newPos, cost: newCost});
         }
       }
     }
 
-      if (minDist != 1000) {
-        return minDist;
-      }
-      return -1;
+    return -1;
   }
-
 }
 
 var input = new InputFile("./day15/input.txt");
 var input1 = new InputFile("./day15/input1.txt");
 
-var chiton = new Chiton(input1.getAsLines());
+var chiton = new Chiton(input.getAsLines());
 console.log(chiton.findShortestPath());
