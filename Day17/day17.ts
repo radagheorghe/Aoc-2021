@@ -63,7 +63,7 @@ class TrickShot {
    
     let inTargetY = new Array<number>();
 
-    let range = 500;
+    let range = 200;
 
     for(let velX = -1 * range; velX <= range; velX++)
       for(let velY = -1 * range; velY <= range; velY++){
