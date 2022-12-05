@@ -13,19 +13,17 @@ class Point {
 
 interface IAmphipod {
   isFinalDest(): boolean;
-  getEnergy(): number;
+  getEnergy(): number;  
 }
 
-class AmphipodA implements IAmphipod  {
-
-  public mPos: Point;
+class AmphipodA extends Point implements IAmphipod   {
 
   constructor(aX: number, aY: number) {
-    this.mPos = new Point(aX, aY);
+    super(aX, aY);
   }
 
   isFinalDest(): boolean {
-    return this.mPos.mX == 3 && (this.mPos.mY == 2 || this.mPos.mY == 3);
+    return this.mX == 3 && (this.mY == 2 || this.mY == 3);
   }
 
   getEnergy(): number {
@@ -33,16 +31,14 @@ class AmphipodA implements IAmphipod  {
   }
 }
 
-class AmphipodB implements IAmphipod  {
-
-  public mPos: Point;
+class AmphipodB extends Point implements IAmphipod  {
 
   constructor(aX: number, aY: number) {
-    this.mPos = new Point(aX, aY);
+    super(aX, aY);
   }
 
   isFinalDest(): boolean {
-    return this.mPos.mX == 5 && (this.mPos.mY == 2 || this.mPos.mY == 3);
+    return this.mX == 5 && (this.mY == 2 || this.mY == 3);
   }
 
   getEnergy(): number {
@@ -50,16 +46,14 @@ class AmphipodB implements IAmphipod  {
   }
 }
 
-class AmphipodC implements IAmphipod  {
-
-  public mPos: Point;
+class AmphipodC extends Point implements IAmphipod  {
 
   constructor(aX: number, aY: number) {
-    this.mPos = new Point(aX, aY);
+    super(aX, aY);
   }
 
   isFinalDest(): boolean {
-    return this.mPos.mX == 7 && (this.mPos.mY == 2 || this.mPos.mY == 3);
+    return this.mX == 7 && (this.mY == 2 || this.mY == 3);
   }
 
   getEnergy(): number {
@@ -67,16 +61,14 @@ class AmphipodC implements IAmphipod  {
   }
 }
 
-class AmphipodD implements IAmphipod  {
-
-  public mPos: Point;
+class AmphipodD extends Point implements IAmphipod  {
 
   constructor(aX: number, aY: number) {
-    this.mPos = new Point(aX, aY);
+    super(aX, aY);
   }
 
   isFinalDest(): boolean {
-    return this.mPos.mX == 9 && (this.mPos.mY == 2 || this.mPos.mY == 3);
+    return this.mX == 9 && (this.mY == 2 || this.mY == 3);
   }
 
   getEnergy(): number {
@@ -87,9 +79,11 @@ class AmphipodD implements IAmphipod  {
 class State {
 
   public mAmphipods: Array<IAmphipod>;
-  
+  public mCost: number;
+
   constructor() {
     this.mAmphipods = new Array<IAmphipod>();
+    this.mCost = 0;
   }
 
   public push(aAmphipod: IAmphipod) {
@@ -97,11 +91,30 @@ class State {
   }
 
   public getNewStates(): Array<State> {
-    return new Array<State>();
+    let states = new Array<State>();
+
+    this.mAmphipods.forEach(amph => {
+
+      let newState = this.moveAmphipod(amph);
+
+      if(newState)
+        states.push(newState);
+    })
+
+    return states;
+  }
+
+  private moveAmphipod(aAmphipod: IAmphipod): State | undefined {
+    
+    let moveX = [1, 2, 4, 6, 8, 10, 11];
+    
+    let state = new State();
+
+    return state;
   }
 
   public getCost(): number {
-    return 0;
+    return this.mCost;
   }
 
   public isFinalState(): boolean {
